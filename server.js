@@ -138,11 +138,13 @@ async function scrapeESPN() {
 // API route
 app.get('/api/wr-consensus', async (req, res) => {
   try {
-    const [cbs, fp, espn] = await Promise.all([
-      scrapeCBS(),
-      scrapeFantasyPros(),
-      scrapeESPN()
-    ]);
+  // TEMP: Only use FantasyPros while we debug
+const [fp] = await Promise.all([
+  scrapeFantasyPros()
+]);
+
+const cbs = [];
+const espn = [];
 
     const consensus = buildConsensus([...cbs, ...fp, ...espn]);
     res.json({ updatedAt: new Date().toISOString(), consensus });
