@@ -54,7 +54,6 @@ function buildConsensus(allSources) {
   return consensus;
 }
 
-// Placeholder scrapers (we will fix selectors later)
 async function scrapeCBS() {
   const url = 'https://www.cbssports.com/fantasy/football/rankings/ppr/WR/';
   const res = await fetch(url);
@@ -65,22 +64,28 @@ async function scrapeCBS() {
 
   $('table tbody tr').each((i, el) => {
     const tds = $(el).find('td');
-    if (tds.length < 3) return;
+    if (tds.length < 2) return;
 
-    const rankText = $(tds[0]).text().trim();
-    const playerRaw = $(tds[1]).text().trim();
-    const oppText = $(tds[2]).text().trim();
-
-    const rank = parseInt(rankText, 10);
+    const rank = parseInt($(tds[0]).text().trim(), 10);
     if (isNaN(rank)) return;
 
-    const teamMatch = oppText.match(/[A-Z]{2,3}/);
-    const team = teamMatch ? teamMatch[0] : '';
+    const playerCell = $(tds[1]);
+    let playerName = playerCell.find('.CellPlayerName--long').text().trim();
+
+    if (!playerName) {
+      // fallback if CBS uses short name
+      playerName = playerCell.text().trim();
+    }
+
+    // Extract team abbreviation if present
+    let team = '';
+    const teamMatch = playerCell.text().match(/\b[A-Z]{2,3}\b/);
+    if (teamMatch) team = teamMatch[0];
 
     rows.push({
       source: 'cbs',
       rank,
-      displayName: playerRaw,
+      displayName: playerName,
       team
     });
   });
