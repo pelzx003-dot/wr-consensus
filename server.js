@@ -113,7 +113,6 @@ async function scrapeFantasyPros() {
 
   const rows = [];
 
-  // FantasyPros rankings table rows
   $('table#data tbody tr').each((i, el) => {
     const rank = parseInt($(el).find('td:nth-child(1)').text().trim(), 10);
     const playerName = $(el).find('td:nth-child(2) a').text().trim();
@@ -132,6 +131,10 @@ async function scrapeFantasyPros() {
   return rows;
 }
 
+// TEMP placeholder: ESPN returns nothing but does NOT crash
+async function scrapeESPN() {
+  return [];
+}
 // API route
 app.get('/api/wr-consensus', async (req, res) => {
   try {
