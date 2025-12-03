@@ -146,8 +146,17 @@ const [fp] = await Promise.all([
 const cbs = [];
 const espn = [];
 
-    const consensus = buildConsensus([...cbs, ...fp, ...espn]);
-    res.json({ updatedAt: new Date().toISOString(), consensus });
+  const consensus = buildConsensus([...cbs, ...fp, ...espn]);
+
+res.json({
+  updatedAt: new Date().toISOString(),
+  counts: {
+    cbs: cbs.length,
+    fantasypros: fp.length,
+    espn: espn.length
+  },
+  consensus
+});
 
   } catch (error) {
     console.error(error);
