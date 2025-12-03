@@ -99,13 +99,37 @@ async function scrapeCBS() {
 }
 
 async function scrapeFantasyPros() {
-  const rows = [];
-  return rows; // placeholder until Step 4
-}
+  const url = 'https://www.fantasypros.com/nfl/rankings/ppr-wr.php';
 
-async function scrapeESPN() {
+  const res = await fetch(url, {
+    headers: {
+      'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)',
+      'Accept-Language': 'en-US,en;q=0.9'
+    }
+  });
+
+  const html = await res.text();
+  const $ = cheerio.load(html);
+
   const rows = [];
-  return rows; // placeholder until Step 4
+
+  // FantasyPros rankings table rows
+  $('table#data tbody tr').each((i, el) => {
+    const rank = parseInt($(el).find('td:nth-child(1)').text().trim(), 10);
+    const playerName = $(el).find('td:nth-child(2) a').text().trim();
+    const team = $(el).find('td:nth-child(3)').text().trim();
+
+    if (!rank || !playerName) return;
+
+    rows.push({
+      source: 'fantasypros',
+      rank,
+      displayName: playerName,
+      team
+    });
+  });
+
+  return rows;
 }
 
 // API route
