@@ -56,7 +56,14 @@ function buildConsensus(allSources) {
 
 async function scrapeCBS() {
   const url = 'https://www.cbssports.com/fantasy/football/rankings/ppr/WR/';
-  const res = await fetch(url);
+
+  const res = await fetch(url, {
+    headers: {
+      'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)',
+      'Accept-Language': 'en-US,en;q=0.9'
+    }
+  });
+
   const html = await res.text();
   const $ = cheerio.load(html);
 
@@ -73,11 +80,9 @@ async function scrapeCBS() {
     let playerName = playerCell.find('.CellPlayerName--long').text().trim();
 
     if (!playerName) {
-      // fallback if CBS uses short name
       playerName = playerCell.text().trim();
     }
 
-    // Extract team abbreviation if present
     let team = '';
     const teamMatch = playerCell.text().match(/\b[A-Z]{2,3}\b/);
     if (teamMatch) team = teamMatch[0];
