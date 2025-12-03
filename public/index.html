@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>WR Consensus Rankings</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+    }
+    button {
+      padding: 10px 20px;
+      background: black;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    table {
+      margin-top: 20px;
+      width: 100%;
+      border-collapse: collapse;
+    }
+    th, td {
+      border: 1px solid #ddd;
+      padding: 8px;
+    }
+    th {
+      background: #f4f4f4;
+    }
+  </style>
+</head>
+<body>
+
+<h1>WR Consensus Rankings</h1>
+
+<button id="loadBtn">Load Rankings</button>
+
+<table id="resultsTable" style="display:none;">
+  <thead>
+    <tr>
+      <th>Rank</th>
+      <th>Player</th>
+      <th>Team</th>
+      <th>Avg Rank</th>
+      <th>CBS</th>
+      <th>FantasyPros</th>
+      <th>ESPN</th>
+      <th>Sources</th>
+    </tr>
+  </thead>
+  <tbody></tbody>
+</table>
+
+<script>
+  const btn = document.getElementById('loadBtn');
+  const table = document.getElementById('resultsTable');
+  const tbody = table.querySelector('tbody');
+
+  btn.addEventListener('click', async () => {
+    btn.disabled = true;
+    btn.textContent = "Loading...";
+
+    try {
+      const response = await fetch('/api/wr-consensus');
+      const data = await response.json();
+
+      tbody.innerHTML = '';
+
+      data.consensus.forEach((player, index) => {
+        const row = document.createElement('tr');
+
+        row.innerHTML = `
+          <td>${index + 1}</td>
+          <td>${player.name}</td>
+          <td>${player.team || ''}</td>
+          <td>${player.averageRank.toFixed(2)}</td>
+          <td>${player.ranks.cbs ?? '-'}</td>
+          <td>${player.ranks.fantasypros ?? '-'}</td>
+          <td>${player.ranks.espn ?? '-'}</td>
+          <td>${player.sources}</td>
+        `;
+
+        tbody.appendChild(row);
+      });
+
+      table.style.display = 'table';
+    } catch (error) {
+      alert('Error fetching rankings.');
+      console.error(error);
+    }
+
+    btn.textContent = "Load Rankings";
+    btn.disabled = false;
+  });
+</script>
+
+</body>
+</html>
